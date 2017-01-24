@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Restaurants map</string>
+
+    <string name="error_title">Error</string>
+    <string name="error_code">Code</string>
+    <string name="error_message">Message</string>
 </resources>

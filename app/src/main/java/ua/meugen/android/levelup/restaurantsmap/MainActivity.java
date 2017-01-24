@@ -6,6 +6,7 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,12 +26,15 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.concurrent.TimeUnit;
 
+import ua.meugen.android.levelup.restaurantsmap.fragments.ConnectionErrorFragment;
+
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = MainActivity.class.getName();
 
+    private static final String MAP_FRAGMENT_TAG = "map";
     private static final int LOCATION_PERMISSIONS_REQUEST = 0;
 
     private GoogleMap googleMap;
@@ -50,8 +54,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable final Bundle bundle) {
-        final SupportMapFragment fragment = (SupportMapFragment)
-                getSupportFragmentManager().findFragmentById(R.id.map);
+        final FragmentManager manager = getSupportFragmentManager();
+
+        SupportMapFragment fragment = (SupportMapFragment) manager
+                .findFragmentByTag(MAP_FRAGMENT_TAG);
+        if (fragment == null) {
+            fragment = SupportMapFragment.newInstance();
+            manager.beginTransaction().replace(R.id.container, fragment,
+                    MAP_FRAGMENT_TAG).commit();
+        }
         fragment.getMapAsync(this);
     }
 
@@ -61,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull final ConnectionResult result) {
         Log.e(TAG, "Connection failed with result: " + result);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container,
+                ConnectionErrorFragment.newInstance(result)).commit();
     }
 
     @Override
