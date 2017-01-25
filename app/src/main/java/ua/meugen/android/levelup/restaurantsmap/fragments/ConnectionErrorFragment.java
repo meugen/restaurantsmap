@@ -12,7 +12,7 @@ import com.google.android.gms.common.ConnectionResult;
 
 import ua.meugen.android.levelup.restaurantsmap.R;
 
-public class ConnectionErrorFragment extends Fragment {
+public final class ConnectionErrorFragment extends Fragment {
 
     private static final String RESULT_KEY = "result";
 

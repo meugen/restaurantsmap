@@ -1,4 +1,4 @@
-package ua.meugen.android.levelup.restaurantsmap;
+package ua.meugen.android.levelup.restaurantsmap.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -20,17 +20,23 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.concurrent.TimeUnit;
 
+import ua.meugen.android.levelup.restaurantsmap.R;
 import ua.meugen.android.levelup.restaurantsmap.fragments.ConnectionErrorFragment;
+import ua.meugen.android.levelup.restaurantsmap.servers.FetchContentService;
 
-public class MainActivity extends AppCompatActivity implements
+public final class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleApiClient.ConnectionCallbacks {
+        LocationListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleMap.OnCameraIdleListener {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -59,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements
         SupportMapFragment fragment = (SupportMapFragment) manager
                 .findFragmentByTag(MAP_FRAGMENT_TAG);
         if (fragment == null) {
-            fragment = SupportMapFragment.newInstance();
+            fragment = SupportMapFragment.newInstance(new GoogleMapOptions()
+                    .zoomControlsEnabled(true).zoomGesturesEnabled(true));
             manager.beginTransaction().replace(R.id.container, fragment,
                     MAP_FRAGMENT_TAG).commit();
         }
@@ -80,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
+        this.googleMap.setOnCameraIdleListener(this);
         checkLocationPermission();
     }
 
@@ -137,5 +145,12 @@ public class MainActivity extends AppCompatActivity implements
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         final CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 14);
         this.googleMap.animateCamera(cameraUpdate);
+    }
+
+    @Override
+    public void onCameraIdle() {
+        final LatLngBounds bounds = this.googleMap.getProjection().getVisibleRegion()
+                .latLngBounds;
+        startService(FetchContentService.createVenuesSearchByRegionIntent(bounds));
     }
 }
