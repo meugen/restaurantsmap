@@ -1,4 +1,4 @@
-package ua.meugen.android.levelup.restaurantsmap.data.model;
+package ua.meugen.android.levelup.restaurantsmap.data;
 
 public final class Meta {
 

@@ -5,7 +5,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.QueryMap;
-import ua.meugen.android.levelup.restaurantsmap.data.model.Content;
+import ua.meugen.android.levelup.restaurantsmap.data.Content;
 import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
 
 public interface FoursquareApi {
