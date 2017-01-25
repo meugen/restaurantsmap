@@ -18,6 +18,8 @@ public final class FoursquareApiWrapper {
     private static final String CLIENT_ID = "SCEQLTPFILFYYIT3TC015UIDTYJNWXWKFLBXLRGD0NSELLRJ";
     private static final String CLIENT_SECRET = "OPMYDTTPJTYZYJDWTQF5XFYZWW4445A245ZWQZQLYS4NRQZV";
 
+    private static final String FOOD_CATEGORY_ID = "4d4b7105d754a06374d81259";
+
     private final FoursquareApi api;
 
     public FoursquareApiWrapper(final FoursquareApi api) {
@@ -30,6 +32,7 @@ public final class FoursquareApiWrapper {
         params.put("m", MODE);
         params.put("client_id", CLIENT_ID);
         params.put("client_secret", CLIENT_SECRET);
+        params.put("categoryId", FOOD_CATEGORY_ID);
         return params;
     }
 

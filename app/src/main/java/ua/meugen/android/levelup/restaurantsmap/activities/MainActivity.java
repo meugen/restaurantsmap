@@ -1,13 +1,21 @@
 package ua.meugen.android.levelup.restaurantsmap.activities;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,23 +33,31 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.concurrent.TimeUnit;
 
 import ua.meugen.android.levelup.restaurantsmap.R;
 import ua.meugen.android.levelup.restaurantsmap.fragments.ConnectionErrorFragment;
-import ua.meugen.android.levelup.restaurantsmap.servers.FetchContentService;
+import ua.meugen.android.levelup.restaurantsmap.providers.FoursquareContent;
+import ua.meugen.android.levelup.restaurantsmap.services.FetchContentService;
 
 public final class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnCameraIdleListener {
+        GoogleMap.OnCameraIdleListener, FoursquareContent {
 
     private static final String TAG = MainActivity.class.getName();
 
     private static final String MAP_FRAGMENT_TAG = "map";
     private static final int LOCATION_PERMISSIONS_REQUEST = 0;
+
+    private final BroadcastReceiver venuesUpdatedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            loadVenues();
+        }
+    };
 
     private GoogleMap googleMap;
     private GoogleApiClient client;
@@ -56,6 +72,21 @@ public final class MainActivity extends AppCompatActivity implements
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        registerReceiver(this.venuesUpdatedReceiver,
+                new IntentFilter(FetchContentService.VENUES_UPDATED_ACTION));
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(this.venuesUpdatedReceiver);
+
+        super.onStop();
     }
 
     @Override
@@ -152,5 +183,39 @@ public final class MainActivity extends AppCompatActivity implements
         final LatLngBounds bounds = this.googleMap.getProjection().getVisibleRegion()
                 .latLngBounds;
         startService(FetchContentService.createVenuesSearchByRegionIntent(bounds));
+    }
+
+    private void loadVenues() {
+        getSupportLoaderManager().restartLoader(0, null, new VenuesLoaderCallbacks());
+    }
+
+    private void venuesLoaded(final Cursor cursor) {
+        while (cursor.moveToNext()) {
+            final LatLng position = new LatLng(cursor.getDouble(1),
+                    cursor.getDouble(2));
+            this.googleMap.addMarker(new MarkerOptions()
+                    .title(cursor.getString(0))
+                    .position(position));
+        }
+    }
+
+    private class VenuesLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            final CursorLoader loader = new CursorLoader(MainActivity.this);
+            loader.setUri(VENUES_URI);
+            loader.setProjection(new String[] {
+                    NAME_FIELD, LOCATION_LAT_FIELD, LOCATION_LNG_FIELD });
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
+            venuesLoaded(cursor);
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<Cursor> loader) {}
     }
 }

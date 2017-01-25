@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".servers.FetchContentService"/>
+        <service android:name=".services.FetchContentService"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

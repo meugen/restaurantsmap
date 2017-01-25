@@ -17,7 +17,7 @@ public class FoursquareDbHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private static final String NAME = "foursquare";
 
-    private static final Pattern PATTERN = Pattern.compile("\\s*([^;]);");
+    private static final Pattern PATTERN = Pattern.compile("\\s*([^;]+);");
 
     private final Context context;
 
