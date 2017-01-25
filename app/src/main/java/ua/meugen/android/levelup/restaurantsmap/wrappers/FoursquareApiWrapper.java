@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ua.meugen.android.levelup.restaurantsmap.api.FoursquareApi;
-import ua.meugen.android.levelup.restaurantsmap.model.Content;
-import ua.meugen.android.levelup.restaurantsmap.responses.Venues;
+import ua.meugen.android.levelup.restaurantsmap.data.model.Content;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
 
 public final class FoursquareApiWrapper {
 

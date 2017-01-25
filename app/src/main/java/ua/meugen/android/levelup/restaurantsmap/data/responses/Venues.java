@@ -1,8 +1,8 @@
-package ua.meugen.android.levelup.restaurantsmap.responses;
+package ua.meugen.android.levelup.restaurantsmap.data.responses;
 
 import java.util.List;
 
-import ua.meugen.android.levelup.restaurantsmap.model.Venue;
+import ua.meugen.android.levelup.restaurantsmap.data.model.Venue;
 
 public final class Venues {
 

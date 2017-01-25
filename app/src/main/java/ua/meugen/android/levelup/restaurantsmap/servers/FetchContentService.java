@@ -9,8 +9,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import java.io.IOException;
 
 import ua.meugen.android.levelup.restaurantsmap.RestaurantsMap;
-import ua.meugen.android.levelup.restaurantsmap.model.Content;
-import ua.meugen.android.levelup.restaurantsmap.responses.Venues;
+import ua.meugen.android.levelup.restaurantsmap.data.model.Content;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
 
 public class FetchContentService extends IntentService {
 

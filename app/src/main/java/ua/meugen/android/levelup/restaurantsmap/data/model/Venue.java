@@ -1,4 +1,4 @@
-package ua.meugen.android.levelup.restaurantsmap.model;
+package ua.meugen.android.levelup.restaurantsmap.data.model;
 
 public final class Venue {
 
