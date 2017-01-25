@@ -10,6 +10,6 @@
  */
 
 /**
- * Package containing Foursquare entity model
+ * Package containing FoursquareContent entity model
  */
 package fi.foyt.foursquare.api.entities;

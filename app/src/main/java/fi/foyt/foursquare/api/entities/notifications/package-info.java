@@ -10,7 +10,7 @@
  */
 
 /**
- * Package containing Foursquare notification model
+ * Package containing FoursquareContent notification model
  * 
  * @see <a href="https://developer.foursquare.com/docs/responses/notifications.html" target="_blank">https://developer.foursquare.com/docs/responses/notifications.html</a>
  */

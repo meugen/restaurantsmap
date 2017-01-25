@@ -14,7 +14,7 @@ package fi.foyt.foursquare.api;
 import java.io.Serializable;
 
 /**
- * Interface for all Foursquare entities
+ * Interface for all FoursquareContent entities
  * 
  * @author Antti Leppä
  */

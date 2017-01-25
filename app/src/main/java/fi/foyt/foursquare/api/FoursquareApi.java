@@ -84,9 +84,9 @@ public class FoursquareApi {
   /**
    * Constructor.
    *
-   * @param clientId Foursquare Client id
-   * @param clientSecret Foursquare Client secret
-   * @param redirectUrl Foursquare Redirect URL
+   * @param clientId FoursquareContent Client id
+   * @param clientSecret FoursquareContent Client secret
+   * @param redirectUrl FoursquareContent Redirect URL
    */
   public FoursquareApi(String clientId, String clientSecret, String redirectUrl) {
     this(clientId, clientSecret, redirectUrl, new DefaultIOHandler());
@@ -95,9 +95,9 @@ public class FoursquareApi {
   /**
    * Constructor.
    *
-   * @param clientId Foursquare Client id
-   * @param clientSecret Foursquare Client secret
-   * @param redirectUrl Foursquare Redirect URL
+   * @param clientId FoursquareContent Client id
+   * @param clientSecret FoursquareContent Client secret
+   * @param redirectUrl FoursquareContent Redirect URL
    * @param ioHandler IOHandler
    */
   public FoursquareApi(String clientId, String clientSecret, String redirectUrl, IOHandler ioHandler) {
@@ -107,9 +107,9 @@ public class FoursquareApi {
   /**
    * Constructor.
    *
-   * @param clientId Foursquare Client id
-   * @param clientSecret Foursquare Client secret
-   * @param redirectUrl Foursquare Redirect URL
+   * @param clientId FoursquareContent Client id
+   * @param clientSecret FoursquareContent Client secret
+   * @param redirectUrl FoursquareContent Redirect URL
    * @param oAuthToken Previously retrieved OAuthToken
    * @param ioHandler IOHandler
    */
@@ -151,10 +151,10 @@ public class FoursquareApi {
   }
 
   /**
-   * Sets Foursquare API version
+   * Sets FoursquareContent API version
    *
    * @param version
-   *          Foursquare API version
+   *          FoursquareContent API version
    */
   public void setVersion(String version) {
     this.version = version;
@@ -515,7 +515,7 @@ public class FoursquareApi {
    * @param phone a comma-delimited list of phone numbers to look for.
    * @param email a comma-delimited list of email addresses to look for.
    * @param twitter a comma-delimited list of Twitter handles to look for.
-   * @param twitterSource a single Twitter handle. Results will be friends of this user who use Foursquare.
+   * @param twitterSource a single Twitter handle. Results will be friends of this user who use FoursquareContent.
    * @param fbid a comma-delimited list of Facebook id's to look for.
    * @param name a single string to search for in users' names.
    * @return array of CompactUser entities wrapped in Result object
@@ -1118,7 +1118,7 @@ public class FoursquareApi {
    * @see <a href="https://developer.foursquare.com/docs/checkins/checkins.html" target="_blank">https://developer.foursquare.com/docs/checkins/checkins.html</a>
    *
    * @param checkinId the ID of the checkin to retrieve additional information for.
-   * @param signature when checkins are sent to public feeds such as Twitter, Foursquare appends a signature (s=XXXXXX) allowing users to bypass the friends-only access check on checkins. The same value can be used here for programmatic access to otherwise inaccessible checkins.
+   * @param signature when checkins are sent to public feeds such as Twitter, FoursquareContent appends a signature (s=XXXXXX) allowing users to bypass the friends-only access check on checkins. The same value can be used here for programmatic access to otherwise inaccessible checkins.
    * @return Checkin entity wrapped in Result object
    * @throws FoursquareApiException when something unexpected happens
    */

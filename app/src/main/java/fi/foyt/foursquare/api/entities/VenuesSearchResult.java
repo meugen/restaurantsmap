@@ -5,7 +5,7 @@ import fi.foyt.foursquare.api.FoursquareEntity;
 /**
  * Result object for venues/search request
  * 
- * In version 20110615 Foursquare changes venues/search request to return 
+ * In version 20110615 FoursquareContent changes venues/search request to return
  * array of venues instead of venue groups what request used to result, 
  * with an exception that sometimes request might still return groups. 
  * For example, on election days, foursquare may choose to temporarily 
