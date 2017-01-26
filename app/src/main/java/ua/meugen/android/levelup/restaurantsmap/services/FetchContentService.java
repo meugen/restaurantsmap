@@ -6,6 +6,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -21,6 +23,7 @@ import ua.meugen.android.levelup.restaurantsmap.data.Content;
 import ua.meugen.android.levelup.restaurantsmap.data.model.Venue;
 import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
 import ua.meugen.android.levelup.restaurantsmap.providers.FoursquareContent;
+import ua.meugen.android.levelup.restaurantsmap.receivers.StartServiceOnConnected;
 
 public class FetchContentService extends IntentService implements FoursquareContent {
 
@@ -34,6 +37,8 @@ public class FetchContentService extends IntentService implements FoursquareCont
 
     private static final int VENUES_SEARCH_BY_REGION = 1;
 
+    private static StartServiceOnConnected connectedReceiver;
+
     public static Intent createVenuesSearchByRegionIntent(final LatLngBounds bounds) {
         final Intent intent = new Intent(RestaurantsMap.INSTANCE, FetchContentService.class);
         intent.putExtra(ACTION_KEY, VENUES_SEARCH_BY_REGION);
@@ -45,8 +50,34 @@ public class FetchContentService extends IntentService implements FoursquareCont
         super("restaurantsmap");
     }
 
+    private static synchronized void handleWhenConnected(final Intent intent) {
+        if (connectedReceiver == null) {
+            connectedReceiver = new StartServiceOnConnected();
+            connectedReceiver.attachNewIntent(intent);
+            connectedReceiver.register(RestaurantsMap.INSTANCE);
+        } else {
+            connectedReceiver.attachNewIntent(intent);
+        }
+    }
+
+    private static synchronized void clearConnectedReceiver() {
+        if (connectedReceiver != null) {
+            connectedReceiver.unregister(RestaurantsMap.INSTANCE);
+            connectedReceiver = null;
+        }
+    }
+
     @Override
     protected void onHandleIntent(final Intent intent) {
+        final ConnectivityManager manager = (ConnectivityManager)
+                getSystemService(CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
+        if (activeNetwork == null || !activeNetwork.isConnected()) {
+            handleWhenConnected(intent);
+            return;
+        }
+        clearConnectedReceiver();
+
         final int action = intent.getIntExtra(ACTION_KEY, 0);
         if (action == VENUES_SEARCH_BY_REGION) {
             venuesSearchByRegion(intent);

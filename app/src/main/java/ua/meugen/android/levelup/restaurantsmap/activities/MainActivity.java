@@ -119,6 +119,7 @@ public final class MainActivity extends AppCompatActivity implements
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
         this.googleMap.setOnCameraIdleListener(this);
+        loadVenues();
         checkLocationPermission();
     }
 
