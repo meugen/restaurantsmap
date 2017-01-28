@@ -12,7 +12,7 @@
 package fi.foyt.foursquare.api.entities;
 
 /**
- * Group of Venues
+ * Group of VenuesResponse
  * 
  * @author Antti Leppä
  */

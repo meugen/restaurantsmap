@@ -2,7 +2,7 @@ package ua.meugen.android.levelup.restaurantsmap.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public final class Location {
+public class Location {
 
     private double lat;
     private double lng;

@@ -4,7 +4,7 @@ import java.util.List;
 
 import ua.meugen.android.levelup.restaurantsmap.data.model.Venue;
 
-public final class Venues {
+public final class VenuesResponse {
 
     private List<Venue> venues;
 

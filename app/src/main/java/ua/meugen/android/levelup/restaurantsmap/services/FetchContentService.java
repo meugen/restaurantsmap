@@ -12,7 +12,6 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLngBounds;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +20,9 @@ import java.util.Set;
 import ua.meugen.android.levelup.restaurantsmap.RestaurantsMap;
 import ua.meugen.android.levelup.restaurantsmap.data.Content;
 import ua.meugen.android.levelup.restaurantsmap.data.model.Venue;
-import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
+import ua.meugen.android.levelup.restaurantsmap.data.model.VenueDetails;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.VenueDetailsResponse;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.VenuesResponse;
 import ua.meugen.android.levelup.restaurantsmap.providers.FoursquareContent;
 import ua.meugen.android.levelup.restaurantsmap.receivers.StartServiceOnConnected;
 
@@ -31,11 +32,15 @@ public class FetchContentService extends IntentService implements FoursquareCont
 
     public static final String VENUES_UPDATED_ACTION
             = "ua.meugen.android.levelup.restaurantsmap.VENUES_UPDATED";
+    public static final String VENUE_DETAILS_UPDATED_ACTION
+            = "ua.meugen.android.levelup.restaurantsmap.VENUE_DETAILS_UPDATED";
 
     private static final String ACTION_KEY = "action";
     private static final String BOUNDS_KEY = "bounds";
+    private static final String VENUE_ID_KEY = "venueId";
 
     private static final int VENUES_SEARCH_BY_REGION = 1;
+    private static final int VENUE_DETAILS = 2;
 
     private static StartServiceOnConnected connectedReceiver;
 
@@ -43,6 +48,13 @@ public class FetchContentService extends IntentService implements FoursquareCont
         final Intent intent = new Intent(RestaurantsMap.INSTANCE, FetchContentService.class);
         intent.putExtra(ACTION_KEY, VENUES_SEARCH_BY_REGION);
         intent.putExtra(BOUNDS_KEY, bounds);
+        return intent;
+    }
+
+    public static Intent createVenueDetails(final String venueId) {
+        final Intent intent = new Intent(RestaurantsMap.INSTANCE, FetchContentService.class);
+        intent.putExtra(ACTION_KEY, VENUE_DETAILS);
+        intent.putExtra(VENUE_ID_KEY, venueId);
         return intent;
     }
 
@@ -81,16 +93,30 @@ public class FetchContentService extends IntentService implements FoursquareCont
         final int action = intent.getIntExtra(ACTION_KEY, 0);
         if (action == VENUES_SEARCH_BY_REGION) {
             venuesSearchByRegion(intent);
+        } else if (action == VENUE_DETAILS) {
+            venueDetails(intent);
         }
     }
 
     private void venuesSearchByRegion(final Intent intent) {
         try {
             final LatLngBounds bounds = intent.getParcelableExtra(BOUNDS_KEY);
-            final Content<Venues> content = RestaurantsMap.INSTANCE
+            final Content<VenuesResponse> content = RestaurantsMap.INSTANCE
                     .getFoursquareApi().venuesSearchByRegion(bounds);
             storeVenues(content.getResponse().getVenues());
             sendBroadcast(new Intent(VENUES_UPDATED_ACTION));
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void venueDetails(final Intent intent) {
+        try {
+            final String venueId = intent.getStringExtra(VENUE_ID_KEY);
+            final Content<VenueDetailsResponse> content = RestaurantsMap.INSTANCE
+                    .getFoursquareApi().venueDetails(venueId);
+            storeVenueDetails(content.getResponse().getVenue());
+            sendBroadcast(new Intent(VENUE_DETAILS_UPDATED_ACTION));
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -118,6 +144,13 @@ public class FetchContentService extends IntentService implements FoursquareCont
         resolver.applyBatch(AUTHORITY, operations);
     }
 
+    private void storeVenueDetails(final VenueDetails details) {
+        final ContentResolver resolver = this.getContentResolver();
+        resolver.update(VENUES_URI,
+                venueDetailsToContentValues(details),
+                "id=?", new String[] { details.getId() });
+    }
+
     private Set<String> fetchIds(final ContentResolver resolver) {
         Cursor cursor = null;
         try {
@@ -135,14 +168,39 @@ public class FetchContentService extends IntentService implements FoursquareCont
         }
     }
 
-    private ContentValues venueToContentValues(final Venue venue) {
-        final ContentValues values = new ContentValues();
+    private void fillContentValues(final ContentValues values, final Venue venue) {
         values.put(ID_FIELD, venue.getId());
         values.put(NAME_FIELD, venue.getName());
         values.put(LOCATION_LAT_FIELD, venue.getLocation().getLat());
         values.put(LOCATION_LNG_FIELD, venue.getLocation().getLng());
         values.put(LOCATION_CC_FIELD, venue.getLocation().getCountryCode());
         values.put(LOCATION_COUNTRY_FIELD, venue.getLocation().getCountry());
+    }
+
+    private ContentValues venueToContentValues(final Venue venue) {
+        final ContentValues values = new ContentValues();
+        fillContentValues(values, venue);
+        return values;
+    }
+
+    private ContentValues venueDetailsToContentValues(final VenueDetails details) {
+        final ContentValues values = new ContentValues();
+        fillContentValues(values, details);
+        values.put(CANONICAL_URL_FIELD, details.getCanonicalUrl());
+        values.put(VERIFIED_FIELD, details.isVerified());
+        values.put(STATS_CHECKINS_COUNT_FIELD, details.getStats().getCheckinsCount());
+        values.put(STATS_USERS_COUNT_FIELD, details.getStats().getUsersCount());
+        values.put(STATS_TIP_COUNT_FIELD, details.getStats().getTipCount());
+        values.put(STATS_VISITS_COUNT_FIELD, details.getStats().getVisitsCount());
+        values.put(PRICE_TIER_FIELD, details.getPrice().getTier());
+        values.put(PRICE_MESSAGE_FIELD, details.getPrice().getMessage());
+        values.put(PRICE_CURRENCY_FIELD, details.getPrice().getCurrency());
+        values.put(LIKES_COUNT_FIELD, details.getLikes().getCount());
+        values.put(LIKES_SUMMARY_FIELD, details.getLikes().getSummary());
+        values.put(DISLIKE_FIELD, details.isDislike());
+        values.put(SHORT_URL_FIELD, details.getShortUrl());
+        values.put(TIME_ZONE_FIELD, details.getTimeZone());
+        values.put(BEST_PHOTO_ID_FIELD, details.getBestPhoto().getId());
         return values;
     }
 }

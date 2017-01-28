@@ -1,17 +1,17 @@
 package ua.meugen.android.levelup.restaurantsmap;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.ContextWrapper;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ua.meugen.android.levelup.restaurantsmap.api.FoursquareApi;
+import ua.meugen.android.levelup.restaurantsmap.json.adapters.PhotosAdapter;
 import ua.meugen.android.levelup.restaurantsmap.wrappers.FoursquareApiWrapper;
 
 
@@ -36,12 +36,14 @@ public final class RestaurantsMap extends ContextWrapper {
                         .addInterceptor(interceptor)
                         .build();
 
-                final Gson gson = new GsonBuilder()
-                        .create();
+                final GsonBuilder builder = new GsonBuilder();
+                PhotosAdapter.register(builder);
+                final Converter.Factory factory = GsonConverterFactory
+                        .create(builder.create());
                 final Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl("https://api.foursquare.com/")
                         .client(client)
-                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .addConverterFactory(factory)
                         .build();
                 final FoursquareApi api = retrofit.create(FoursquareApi.class);
                 this.wrapper = new FoursquareApiWrapper(api);

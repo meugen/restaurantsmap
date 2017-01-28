@@ -1054,7 +1054,7 @@ public class FoursquareApi {
 
 
   /**
-   * Venues Autocomplete
+   * VenuesResponse Autocomplete
    * https://developer.foursquare.com/docs/venues/suggestcompletion
    * @param ll
    * @param llAcc

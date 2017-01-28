@@ -1,6 +1,6 @@
 package ua.meugen.android.levelup.restaurantsmap.data.model;
 
-public final class Venue {
+public class Venue {
 
     private String id;
     private String name;

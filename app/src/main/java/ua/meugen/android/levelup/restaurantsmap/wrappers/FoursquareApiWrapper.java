@@ -9,7 +9,8 @@ import java.util.Map;
 
 import ua.meugen.android.levelup.restaurantsmap.api.FoursquareApi;
 import ua.meugen.android.levelup.restaurantsmap.data.Content;
-import ua.meugen.android.levelup.restaurantsmap.data.responses.Venues;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.VenueDetailsResponse;
+import ua.meugen.android.levelup.restaurantsmap.data.responses.VenuesResponse;
 
 public final class FoursquareApiWrapper {
 
@@ -32,7 +33,6 @@ public final class FoursquareApiWrapper {
         params.put("m", MODE);
         params.put("client_id", CLIENT_ID);
         params.put("client_secret", CLIENT_SECRET);
-        params.put("categoryId", FOOD_CATEGORY_ID);
         return params;
     }
 
@@ -40,11 +40,16 @@ public final class FoursquareApiWrapper {
         return "" + latLng.latitude + "," + latLng.longitude;
     }
 
-    public Content<Venues> venuesSearchByRegion(final LatLngBounds bounds) throws IOException {
+    public Content<VenuesResponse> venuesSearchByRegion(final LatLngBounds bounds) throws IOException {
         final Map<String, String> params = buildBasicParams();
         params.put("intent", "browse");
         params.put("sw", latLngToValue(bounds.southwest));
         params.put("ne", latLngToValue(bounds.northeast));
+        params.put("categoryId", FOOD_CATEGORY_ID);
         return this.api.venuesSearch(params).execute().body();
+    }
+
+    public Content<VenueDetailsResponse> venueDetails(final String venueId) throws IOException {
+        return this.api.venueDetails(venueId, buildBasicParams()).execute().body();
     }
 }
